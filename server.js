@@ -12,7 +12,7 @@ const upload = multer({ storage: storage });
 
 app.post('/save-video', upload.single('video'), (req, res) => {
     console.log('Received video upload request');
-    
+
     // Ensure the request contains a file
     if (!req.file) {
         console.error('No video file received');
