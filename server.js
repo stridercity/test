@@ -13,6 +13,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/save-video', upload.single('video'), (req, res) => {
+    console.log('Received video upload request');
     const videoBuffer = req.file.buffer; // You may need to adapt this based on your implementation
     const filePath = 'public/animation.webm';
 
