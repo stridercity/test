@@ -424,36 +424,40 @@
         document.getElementById('submitBtn').disabled = false;
     }
 
-    function startRecording() {
-        const canvas = document.getElementById('animationCanvas');
-        const stream = canvas.captureStream();
-        recorder = RecordRTC(stream, {
-            type: 'video',
-            frameInterval: 1,
-            mimeType: 'video/webm;codecs=vp9',
-        });
+    
+        function startRecording() {
+            const canvas = document.getElementById('animationCanvas');
+            const stream = canvas.captureStream();
+            recorder = new MediaRecorder(stream);
+            const chunks = [];
 
-        recorder.startRecording();
-        isRecording = true;
-        document.getElementById('record').disabled = true;
-        document.getElementById('stopRecord').disabled = false;
-    }
+            recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    chunks.push(event.data);
+                }
+            };
 
-    function stopRecording() {
-        recorder.stopRecording(() => {
-            const blob = recorder.getBlob();
-            const url = URL.createObjectURL(blob);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const videoUrl = URL.createObjectURL(blob);
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = videoUrl;
+                downloadLink.download = 'animation.webm';
+                downloadLink.style.display = 'block';
+            };
 
-            const downloadLink = document.getElementById('downloadLink');
-            downloadLink.href = url;
-            downloadLink.download = 'animation.webm';
-            downloadLink.style.display = 'block';
+            recorder.start();
+            isRecording = true;
+            document.getElementById('record').disabled = true;
+            document.getElementById('stopRecord').disabled = false;
+        }
 
+        function stopRecording() {
+            recorder.stop();
+            isRecording = false;
             document.getElementById('record').disabled = false;
             document.getElementById('stopRecord').disabled = true;
-            isRecording = false;
-        });
-    }
+        }
 
 function loadMap(style) {
     map.setStyle(style);
