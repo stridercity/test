@@ -15,8 +15,8 @@
     <script src="https://cdn.webrtc-experiment.com/msr/MediaStreamRecorder.js"></script>
     <script src="https://cdn.webrtc-experiment.com/msr/WhammyRecorder.js"></script>
     <script src="https://cdn.webrtc-experiment.com/msr/whammy.js"></script>
-
-    <script src="path/to/mp4-encoder.js"></script>
+<script src="/script.js"></script>
+    <script src="https://unpkg.com/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js"></script>
     <style>
         body {
             margin: 0;
@@ -753,33 +753,7 @@ function loadMap(style) {
         });
     });
 
-    document.getElementById('submitBtn').addEventListener('click', () => {
-        const departureInput = document.getElementById('departure').value;
-        const arrivalInput = document.getElementById('arrival').value;
-        const selectedVehicle = document.getElementById('vehicleDropdown').value;
-        const selectedStyle = document.getElementById('routeLineStyleDropdown').value;
-        const selectedTravelMode = document.getElementById('travelModeDropdown').value;
-
-        point.features[0].properties.vehicle = selectedVehicle;
-
-        geocode(departureInput, originCoordinates => {
-            geocode(arrivalInput, destinationCoordinates => {
-                origin = originCoordinates;
-                destination = destinationCoordinates;
-
-                point.features[0].geometry.coordinates = origin;
-
-                route.features[0].properties.style = selectedStyle;
-
-                resetAnimation(); // Reset animation before starting a new one
-                animateRoute(selectedVehicle, selectedTravelMode);
-
-                const lineDistance = turf.distance(turf.point(origin), turf.point(destination));
-                console.log('Distance:', lineDistance.toFixed(2), 'kilometers');
-                distanceTag.innerText = `Distance: ${lineDistance.toFixed(2)} kilometers`;
-            });
-        });
-    });
+  document.getElementById('submitBtn')
 		
 		
 
