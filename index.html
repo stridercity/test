@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Animate a point along a route - Satellite Style</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Montserrat:wght@300&display=swap">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
+    <script src="https://cdn.webrtc-experiment.com/gumadapter.js"></script>
+    <script src="path/to/mp4-encoder.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1f2024;
+            color: #fff;
+        }
+
+        .container {
+            height: 100vh;
+            align-items: center;
+            margin-left: 290px;
+            width: 60%;
+            height: 1200px;
+            display: flex;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 9px;
+            left: 0;
+            height: 90%;
+            width: 200px;
+            max-width: 200px;
+            background-color: #2b2c31;
+            border: 3px solid #303136;
+            border-radius: 15px;
+            margin-left: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .map-container {
+            width: 66%;
+            height: 80%;
+            position: fixed;
+            bottom: 110px;
+            flex: 1;
+            padding: 20px;
+            background-color: #2b2c31;
+            border: 3px solid #303136;
+            border-radius: 25px;
+        }
+
+        .custom-tag {
+            width: 190px;
+            height: 30px;
+            background-color: #35363b;
+            border: 2px solid #2c2d32;
+            border-radius: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            position: center;
+            top: 0;
+            left: 0;
+            bottom: 150;
+            right: 0;
+        }
+
+        .navbar-input {
+            background-color: #2b2c31;
+            border: 1px solid #2f3035;
+            color: white;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .vehicle-dropdown {
+            background-color: #2b2c31;
+            border: 1px solid #2f3035;
+            color: white;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        #submitBtn,
+        #replay,
+        #record,
+        #stopRecord {
+            background-color: #2b2c31;
+            color: white;
+            border: 1px solid #2f3035;
+            padding: 8px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .theme-container {
+            align-items: center;
+            justify-content: center;
+        }
+
+        #submitBtn:hover,
+        #replay:hover,
+        #record:hover,
+        #stopRecord:hover {
+            background-color: #1d1e21;
+        }
+		
+		
+		   #clearAnimationBtn {
+        background-color: #2b2c31;
+        color: white;
+    border: 1px solid #2f3035;
+    padding: 8px 15px;
+    margin: 5px 0;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #clearAnimationBtn:hover {
+        background-color: #1d1e21;
+    }
+		
+
+        .theme-container button {
+            background: none;
+            border: none;
+            margin-left: 4px;
+            padding: 0;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-container button img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .distance-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #distanceTag {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="navbar-brand"><img src="images/GEOGLIDESTUDIO.PNG"></div>
+            <div class="custom-tag">MAP STYLE</div>
+            <div class="theme-container">
+                <button onclick="loadMap('mapbox://styles/mapbox/streets-v12')">
+                    <img src="/icons/streets.png" alt="Streets">
+                </button>
+                <button onclick="loadMap('mapbox://styles/mapbox/outdoors-v12')">
+                    <img src="/icons/outdoors.png" alt="Outdoors">
+                </button>
+                <button onclick="loadMap('mapbox://styles/mapbox/light-v11')">
+                    <img src="/icons/light.png" alt="Light">
+                </button>
+                <button onclick="loadMap('mapbox://styles/mapbox/dark-v11')">
+                    <img src="/icons/dark.png" alt="Dark">
+                </button>
+            </div>
+            <div class="custom-tag">DEPARTURE & ARRIVAL</div>
+            <div class="navbar-buttons">
+                <input type="text" id="departure" class="navbar-input" placeholder="Departure City">
+                <input type="text" id="arrival" class="navbar-input" placeholder="Arrival City">
+                <div class="theme-container">
+                    <div class="custom-tag">VEHICLE</div>
+                    <CENTER>
+                        <select id="vehicleDropdown" class="vehicle-dropdown">
+                            <option value="plane">Plane</option>
+                            <option value="boat">Boat</option>
+                            <option value="car">Car</option>
+                        </select>
+                    </CENTER>
+                </div>
+                <div class="theme-container">
+                    <div class="custom-tag">TRAVEL MODE</div>
+                    <select id="travelModeDropdown" class="vehicle-dropdown">
+                        <option value="land">Land</option>
+                        <option value="air">Air</option>
+                        <option value="boat">Boat</option>
+                    </select>
+                </div>
+                <div class="theme-container">
+                    <div class="custom-tag">ROUTE LINE STYLE</div>
+                    <center>
+                        <select id="routeLineStyleDropdown" class="vehicle-dropdown">
+                            <option value="blue">Blue Line</option>
+                            <option value="red-dotted">Red Dotted Line</option>
+                            <option value="yellow">Yellow Line</option>
+                        </select>
+                    </center>
+					<div class="theme-container">
+<div class="custom-tag">ANIMATION SPEED</div>
+<input type="range" id="animationSpeedSlider" min="1" max="10" value="5" class="vehicle-dropdown">
+</div>
+                    <br><br>
+                    <input type="checkbox" id="distanceCheckbox" onclick="toggleDistanceVisibility()"> Show Distance
+					
+					
+					
+					<button id="clearAnimationBtn" class="navbar-button button-89">Clear Animation</button>
+
+                    <CENTER> <button class="navbar-button button-89" id="submitBtn">Submit</button></CENTER>
+                </div>
+            </div>
+        </div>
+        <div class="map-container">
+            <div id="map"></div>
+            <canvas id="animationCanvas"></canvas>
+        </div>
+        <div class="custom-tag">ROUTE LINE STYLE</div>
+   <div class="distance-container" style="display: none;" id="distance-container">
+           <span id="distanceTag">0.00</span> kilometers
+        </div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYmFyZWJlYWNoMSIsImEiOiJjbHBrOGZyOTYwN2sxMmptcmxscHJmZTd2In0.sHV9n3l-dmiouWxxLcZmdw';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        center: [-96, 37.8],
+        zoom: 3,
+        pitch: 40
+    });
+
+    const distanceTag = document.getElementById('distanceTag');
+
+    if (!distanceTag) {
+        console.error('Distance tag element not found in the HTML.');
+    }
+
+    const images = ['plane', 'boat', 'car'];
+
+    function toggleDistanceVisibility() {
+        const distanceContainer = document.getElementById('distance-container'); // Corrected ID
+        distanceContainer.style.display = document.getElementById('distanceCheckbox').checked ? 'block' : 'none';
+    }
+
+    function updateDistanceTagPosition(coordinates) {
+        const distanceContainer = document.getElementById('distance-container');
+        if (distanceContainer) {
+            const pointPixels = map.project(coordinates);
+            distanceContainer.style.left = pointPixels.x + 'px';
+            distanceContainer.style.top = pointPixels.y + 'px';
+        } else {
+            console.error('Distance container element not found in the HTML.');
+        }
+    }
+
+    function addImageToMap(imageName) {
+        map.loadImage(`/images/${imageName}.png`, (error, img) => {
+            if (error) throw error;
+            map.addImage(imageName, img);
+        });
+    }
+
+    images.forEach(image => {
+        addImageToMap(image);
+    });
+
+    let origin;
+    let destination;
+
+    const point = {
+        'type': 'FeatureCollection',
+        'features': [{
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [0, 0]
+            }
+        }]
+    };
+
+    const route = {
+        'type': 'FeatureCollection',
+        'features': [{
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': []
+            },
+            'properties': {
+                'style': 'default' // default style
+            }
+        }]
+    };
+
+    const steps = 200;
+    const arc = Array.from({ length: steps }, () => [0, 0]);
+
+    route.features[0].geometry.coordinates = arc;
+
+    let counter = 0;
+    let running = false;
+    let recorder;
+    let isRecording = false;
+    let animationStarted = false;
+
+    function lerp(start, end, amt) {
+        return (1 - amt) * start + amt * end;
+    }
+
+   function animate() {
+    if (!animationStarted) {
+        setTimeout(() => {
+            animationStarted = true;
+            animate();
+        }, 1000);
+        return;
+    }
+
+    running = true;
+
+    const start = route.features[0].geometry.coordinates[counter >= steps ? counter - 1 : counter];
+    const end = route.features[0].geometry.coordinates[counter >= steps ? counter : counter + 1];
+
+    if (!start || !end) {
+        running = false;
+        document.getElementById('replay').disabled = false;
+        resetAnimation();
+        return;
+    }
+
+    const lerpedCoordinates = [
+        lerp(start[0], end[0], 0.1),
+        lerp(start[1], end[1], 0.1)
+    ];
+
+    point.features[0].geometry.coordinates = lerpedCoordinates;
+    point.features[0].properties.bearing = turf.bearing(turf.point(start), turf.point(end));
+
+    // Check if sources exist before updating data
+    const routeSource = map.getSource('route');
+    const pointSource = map.getSource('point');
+
+    if (routeSource && pointSource) {
+        routeSource.setData(route);
+        pointSource.setData(point);
+    } else {
+        console.error('Map sources not found.');
+    }
+
+    updateDistanceTagPosition(lerpedCoordinates);
+
+    map.panTo(lerpedCoordinates);
+
+    // Use the animation speed value to control the duration of each animation step
+    const animationSpeed = document.getElementById('animationSpeedSlider').value;
+    const duration = 1000 / animationSpeed; // Adjust the duration based on the speed value
+
+    if (counter < steps) {
+        setTimeout(() => {
+            requestAnimationFrame(animate);
+        }, duration);
+    } else {
+        resetAnimation();
+        document.getElementById('replay').disabled = true;
+    }
+
+    counter = counter + 1;
+}
+    function resetAnimation() {
+        running = false;
+        animationStarted = false;
+
+        route.features[0].geometry.coordinates = [];
+        point.features[0].geometry.coordinates = [0, 0];
+        point.features[0].properties.bearing = 0;
+
+        map.getSource('route').setData(route);
+        map.getSource('point').setData(point);
+
+        map.flyTo({
+            center: [-96, 37.8],
+            zoom: 3,
+            pitch: 40,
+            essential: true
+        });
+
+        document.getElementById('departure').disabled = false;
+        document.getElementById('arrival').disabled = false;
+        document.getElementById('vehicleDropdown').disabled = false;
+        document.getElementById('submitBtn').disabled = false;
+    }
+
+    function startRecording() {
+        const canvas = document.getElementById('animationCanvas');
+        const stream = canvas.captureStream();
+        recorder = RecordRTC(stream, {
+            type: 'video',
+            frameInterval: 1,
+            mimeType: 'video/webm;codecs=vp9',
+        });
+
+        recorder.startRecording();
+        isRecording = true;
+        document.getElementById('record').disabled = true;
+        document.getElementById('stopRecord').disabled = false;
+    }
+
+    function stopRecording() {
+        recorder.stopRecording(() => {
+            const blob = recorder.getBlob();
+            const url = URL.createObjectURL(blob);
+
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadLink.download = 'animation.webm';
+            downloadLink.style.display = 'block';
+
+            document.getElementById('record').disabled = false;
+            document.getElementById('stopRecord').disabled = true;
+            isRecording = false;
+        });
+    }
+
+function loadMap(style) {
+    map.setStyle(style);
+
+    map.on('style.load', function () {
+        // Check if sources exist; if not, add the sources and layers
+        if (!map.getSource('route')) {
+            map.addSource('route', {
+                'type': 'geojson',
+                'data': route
+            });
+
+            map.addLayer({
+                'id': 'route',
+                'source': 'route',
+                'type': 'line',
+                'paint': {
+                    'line-width': 2,
+                    'line-color': ['case',
+                        ['==', ['get', 'style'], 'default'], '#ff0000',
+                        ['==', ['get', 'style'], 'blue'], '#0000ff',
+                        ['==', ['get', 'style'], 'yellow'], '#ffff00',
+                        '#ff0000'
+                    ]
+                }
+            });
+
+            map.addSource('point', {
+                'type': 'geojson',
+                'data': point
+            });
+
+            map.addLayer({
+                'id': 'point',
+                'source': 'point',
+                'type': 'symbol',
+                'layout': {
+                    'icon-image': ['get', 'vehicle'],
+                    'icon-size': 1.5,
+                    'icon-rotate': ['get', 'bearing'],
+                    'icon-rotation-alignment': 'map',
+                    'icon-allow-overlap': true,
+                }
+            });
+
+            // Add the images to the map for the new style
+            images.forEach(image => {
+                addImageToMap(image);
+            });
+        }
+
+        // Update existing sources with new data
+        map.getSource('route').setData(route);
+        map.getSource('point').setData(point);
+    });
+}
+    function geocode(city, callback) {
+        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${city}.json?access_token=${mapboxgl.accessToken}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Geocoding failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const features = data.features;
+                if (features.length > 0) {
+                    const [lng, lat] = features[0].center;
+                    callback([lng, lat]);
+                } else {
+                    throw new Error('No coordinates found for the given location');
+                }
+            })
+            .catch(error => {
+                console.error('Geocoding error:', error);
+            });
+    }
+
+    function getLandRoute(origin, destination) {
+        const accessToken = 'pk.eyJ1IjoiYmFyZWJlYWNoMSIsImEiOiJjbHBrOGZyOTYwN2sxMmptcmxscHJmZTd2In0.sHV9n3l-dmiouWxxLcZmdw';
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin[0]},${origin[1]};${destination[0]},${destination[1]}?steps=true&geometries=geojson&access_token=${accessToken}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const routeCoordinates = data.routes[0].geometry.coordinates;
+
+                // Clear existing arc coordinates
+                arc.length = 0;
+
+                // Push new route coordinates to the arc
+                for (const coordinate of routeCoordinates) {
+                    arc.push(coordinate);
+                }
+
+                // Update the route feature
+                route.features[0].geometry.coordinates = arc;
+
+                // Update the map source
+                if (map.getSource('route')) {
+                    map.getSource('route').setData(route);
+                } else {
+                    console.error('Map source "route" not found.');
+                }
+
+                // Start the animation
+                counter = 0;
+                animationStarted = false;
+                animate();
+            })
+            .catch(error => {
+                console.error('Error fetching land route:', error);
+            });
+    }
+
+   function animateRoute(selectedVehicle, selectedTravelMode) {
+        map.flyTo({
+            center: origin,
+            zoom: 15,
+            speed: 1.5,
+            essential: true
+        }, {
+            duration: 5000
+        });
+
+        setTimeout(() => {
+            map.flyTo({
+                center: origin,
+                zoom: 3,
+                speed: 1.5,
+                essential: true
+            }, {
+                duration: 5000
+            });
+        }, 2000);
+
+        setTimeout(() => {
+            map.flyTo({
+                center: destination,
+                zoom: 15,
+                speed: 1.5,
+                essential: true
+            }, {
+                duration: 5000
+            });
+        }, 4000);
+
+        setTimeout(() => {
+            map.flyTo({
+                center: destination,
+                zoom: 3,
+                speed: 1.5,
+                essential: true
+            }, {
+                duration: 5000
+            });
+        }, 6000);
+
+        setTimeout(() => {
+            const lineDistance = turf.distance(turf.point(origin), turf.point(destination));
+            arc.length = 0;
+
+            if (selectedTravelMode === 'land') {
+                console.log('Fetching land route...');
+                isLandRouteAvailable(origin, destination)
+                    .then(isAvailable => {
+                        if (!isAvailable) {
+                            alert('Your route is crossing international waters. Please select air/water route.');
+                            resetAnimation();
+                            return;
+                        }
+                        getLandRoute(origin, destination);
+                    })
+                    .catch(error => {
+                        console.error('Error checking land route availability:', error);
+                        resetAnimation();
+                    });
+            } else {
+                for (let i = 0; i < lineDistance; i += lineDistance / steps) {
+                    const segment = turf.along(turf.lineString([origin, destination]), i);
+                    arc.push(segment.geometry.coordinates);
+                }
+            }
+
+            route.features[0].geometry.coordinates = arc;
+
+            if (map.getSource('route')) {
+                map.getSource('route').setData(route);
+            } else {
+                console.error('Map source "route" not found.');
+            }
+
+            counter = 0;
+            animationStarted = false;
+
+            map.panTo(arc[0]);
+
+            point.features[0].properties.vehicle = selectedVehicle;
+
+            if (map.getSource('point')) {
+                map.getSource('point').setData(point);
+            } else {
+                console.error('Map source "point" not found.');
+            }
+
+            animate();
+        }, 8000);
+    }
+
+    function isLandRouteAvailable(origin, destination) {
+        const accessToken = 'pk.eyJ1IjoiYmFyZWJlYWNoMSIsImEiOiJjbHBrOGZyOTYwN2sxMmptcmxscHJmZTd2In0.sHV9n3l-dmiouWxxLcZmdw';
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin[0]},${origin[1]};${destination[0]},${destination[1]}?steps=true&access_token=${accessToken}`;
+
+        return fetch(url)
+            .then(response => response.json())
+            .then(data => data.routes && data.routes.length > 0)
+            .catch(error => {
+                console.error('Error checking land route availability:', error);
+                return false;
+            });
+    }
+
+    map.on('load', () => {
+        map.addSource('route', {
+            'type': 'geojson',
+            'data': route
+        });
+
+        map.addSource('point', {
+            'type': 'geojson',
+            'data': point
+        });
+
+        map.addLayer({
+            'id': 'route',
+            'source': 'route',
+            'type': 'line',
+            'paint': {
+                'line-width': 2,
+                'line-dasharray': [2, 2],
+                'line-color': [
+                    'case',
+                    ['==', ['get', 'style'], 'default'],
+                    '#ff0000',
+                    ['==', ['get', 'style'], 'blue'], // blue style
+                    '#0000ff',
+                    ['==', ['get', 'style'], 'yellow'], // yellow style
+                    '#ffff00',
+                    '#ff0000' // default color
+                ]
+            }
+        });
+
+        map.addLayer({
+            'id': 'point',
+            'source': 'point',
+            'type': 'symbol',
+            'layout': {
+                'icon-image': ['get', 'vehicle'],
+                'icon-size': 1.5,
+                'icon-rotate': ['get', 'bearing'],
+                'icon-rotation-alignment': 'map',
+                'icon-allow-overlap': true,
+            }
+        });
+		
+		
+		
+		
+		
+		
+		document.getElementById('clearAnimationBtn').addEventListener('click', () => {
+        resetAnimation();
+        document.getElementById('replay').disabled = false;
+        document.getElementById('departure').disabled = false;
+        document.getElementById('arrival').disabled = false;
+        document.getElementById('vehicleDropdown').disabled = false;
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('distanceCheckbox').checked = false;
+        toggleDistanceVisibility();
+        map.flyTo({
+            center: [-96, 37.8],
+            zoom: 3,
+            pitch: 40,
+            essential: true
+        });
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+        const departureInput = document.getElementById('departure').value;
+        const arrivalInput = document.getElementById('arrival').value;
+        const selectedVehicle = document.getElementById('vehicleDropdown').value;
+        const selectedStyle = document.getElementById('routeLineStyleDropdown').value;
+        const selectedTravelMode = document.getElementById('travelModeDropdown').value;
+
+        point.features[0].properties.vehicle = selectedVehicle;
+
+        geocode(departureInput, originCoordinates => {
+            geocode(arrivalInput, destinationCoordinates => {
+                origin = originCoordinates;
+                destination = destinationCoordinates;
+
+                point.features[0].geometry.coordinates = origin;
+
+                route.features[0].properties.style = selectedStyle;
+
+                resetAnimation(); // Reset animation before starting a new one
+                animateRoute(selectedVehicle, selectedTravelMode);
+
+                const lineDistance = turf.distance(turf.point(origin), turf.point(destination));
+                console.log('Distance:', lineDistance.toFixed(2), 'kilometers');
+                distanceTag.innerText = `Distance: ${lineDistance.toFixed(2)} kilometers`;
+            });
+        });
+    });
+		
+		
+
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const departureInput = document.getElementById('departure').value;
+            const arrivalInput = document.getElementById('arrival').value;
+            const selectedVehicle = document.getElementById('vehicleDropdown').value;
+            const selectedStyle = document.getElementById('routeLineStyleDropdown').value;
+            const selectedTravelMode = document.getElementById('travelModeDropdown').value;
+
+            point.features[0].properties.vehicle = selectedVehicle;
+
+            geocode(departureInput, originCoordinates => {
+                geocode(arrivalInput, destinationCoordinates => {
+                    origin = originCoordinates;
+                    destination = destinationCoordinates;
+
+                    point.features[0].geometry.coordinates = origin;
+
+                    route.features[0].properties.style = selectedStyle;
+
+                    animateRoute(selectedVehicle, selectedTravelMode);
+
+                    const lineDistance = turf.distance(turf.point(origin), turf.point(destination));
+                    console.log('Distance:', lineDistance.toFixed(2), 'kilometers');
+                    distanceTag.innerText = `Distance: ${lineDistance.toFixed(2)} kilometers`;
+                });
+            });
+        });
+
+        document.getElementById('record').addEventListener('click', () => {
+            startRecording();
+        });
+
+        document.getElementById('stopRecord').addEventListener('click', () => {
+            stopRecording();
+        });
+
+        document.getElementById('satelliteStyleBtn').addEventListener('click', () => {
+            // No action needed, as already on the satellite-style page
+        });
+
+        document.getElementById('darkStyleBtn').addEventListener('click', () => {
+            goToDarkPage();
+        });
+    });
+</script>
+
+</body>
+
+</html>
