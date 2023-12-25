@@ -13,7 +13,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/save-video', upload.single('video'), (req, res) => {
-    const videoBuffer = req.file.buffer;
+    const videoBuffer = req.file.buffer; // You may need to adapt this based on your implementation
     const filePath = 'public/animation.webm';
 
     fs.writeFile(filePath, videoBuffer, (err) => {
@@ -26,7 +26,6 @@ app.post('/save-video', upload.single('video'), (req, res) => {
         }
     });
 });
-
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
