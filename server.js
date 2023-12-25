@@ -1,9 +1,10 @@
 // server.js
+
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const app = express();
-const port = process.env.PORT || 3000; // Use the environment variable PORT if available, or default to 3000
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -13,7 +14,7 @@ const upload = multer({ storage: storage });
 
 app.post('/save-video', upload.single('video'), (req, res) => {
     const videoBuffer = req.file.buffer;
-    const filePath = 'public/animation.mp4';
+    const filePath = 'public/animation.webm';
 
     fs.writeFile(filePath, videoBuffer, (err) => {
         if (err) {
