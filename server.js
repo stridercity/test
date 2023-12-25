@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
@@ -14,19 +12,27 @@ const upload = multer({ storage: storage });
 
 app.post('/save-video', upload.single('video'), (req, res) => {
     console.log('Received video upload request');
-    const videoBuffer = req.file.buffer; // You may need to adapt this based on your implementation
+    
+    // Ensure the request contains a file
+    if (!req.file) {
+        console.error('No video file received');
+        return res.status(400).json({ error: 'No video file received' });
+    }
+
+    const videoBuffer = req.file.buffer;
     const filePath = 'public/animation.webm';
 
     fs.writeFile(filePath, videoBuffer, (err) => {
         if (err) {
             console.error('Error saving video:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-            console.log('Video saved successfully');
-            res.json({ success: true });
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
+
+        console.log('Video saved successfully');
+        res.json({ success: true });
     });
 });
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
