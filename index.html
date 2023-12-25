@@ -259,6 +259,14 @@
            <span id="distanceTag">0.00</span> kilometers
         </div>
 <script>
+
+ console.log('Script loaded');
+    
+    document.getElementById('submitBtn').addEventListener('click', () => {
+        console.log('Submit button clicked');
+
+
+	
     mapboxgl.accessToken = 'pk.eyJ1IjoiYmFyZWJlYWNoMSIsImEiOiJjbHBrOGZyOTYwN2sxMmptcmxscHJmZTd2In0.sHV9n3l-dmiouWxxLcZmdw';
 
     const map = new mapboxgl.Map({
