@@ -433,6 +433,7 @@
 
     
         function startRecording() {
+		    console.log('Recording started');
             const canvas = document.getElementById('animationCanvas');
             const stream = canvas.captureStream();
             recorder = new MediaRecorder(stream);
@@ -460,6 +461,7 @@
         }
 
         function stopRecording() {
+		    console.log('Recording stopped');
             recorder.stop();
             isRecording = false;
             document.getElementById('record').disabled = false;
