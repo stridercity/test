@@ -1,1 +1,65 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        #countdown {
+            font-size: 5rem;
+            margin: 20px 0;
+        }
+        .header-text {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-text">Ultimate AI Tool for Detecting Rugpulls</div>
+    <div id="countdown"></div>
+
+    <script>
+        function countdownTimer() {
+            const countdownElement = document.getElementById('countdown');
+            const targetDate = new Date();
+            targetDate.setDate(17);
+            targetDate.setHours(0, 0, 0, 0);
+
+            const currentDate = new Date();
+            if (currentDate.getDate() > 17) {
+                targetDate.setMonth(targetDate.getMonth() + 1);
+            }
+
+            const timeDifference = targetDate - currentDate;
+
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            if (timeDifference < 0) {
+                clearInterval(timerInterval);
+                countdownElement.innerHTML = "EXPIRED";
+            }
+        }
+
+        const timerInterval = setInterval(countdownTimer, 1000);
+    </script>
+</body>
+</html>
