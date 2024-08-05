@@ -1,0 +1,357 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Roboto Mono', monospace; 
+  background-color: rgb(23, 17, 39); 
+  color: #fff;
+  overflow-y: hidden; 
+  overflow-x: hidden; 
+}
+
+.landing-page, .pumpfun-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: space-between;
+  overflow-y: auto; 
+}
+
+.landing-page::-webkit-scrollbar, .pumpfun-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.landing-page::-webkit-scrollbar-thumb, .pumpfun-page::-webkit-scrollbar-thumb {
+  background-color: rgb(32, 24, 49); 
+  border-radius: 10px;
+}
+
+.landing-page::-webkit-scrollbar-thumb:hover, .pumpfun-page::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(23, 17, 39); 
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 2rem; 
+  background-color: rgb(23, 17, 39); 
+  width: 100%; 
+  box-sizing: border-box; 
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  height: calc(40px * 1.15);
+  width: auto;
+}
+
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  margin-top: 10px;
+}
+
+.nav-link:hover {
+  color: #cc99ff; 
+}
+
+.detected-bar {
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: rgb(32, 24, 49); 
+  color: #fff;
+}
+
+.ticker-wrapper {
+  background-color: rgb(23, 17, 39); 
+  color: #ffffff; 
+  margin-bottom: 1rem; 
+  width: 100%; 
+  padding: 1rem 0; 
+  position: relative; 
+  font-size: small;
+  overflow: hidden; 
+  box-sizing: border-box;
+  height: 3rem; 
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap; 
+  position: absolute; 
+  animation: ticker-scroll 40s linear infinite; 
+  top: 50%; 
+  transform: translateY(-50%); 
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(100%); 
+  }
+  100% {
+    transform: translateX(-100%); 
+  }
+}
+
+.content {
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 3rem; 
+}
+
+.button-container {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 1rem; 
+}
+
+.main-button {
+  background-color: rgb(32, 24, 49); 
+  color: #fff;
+  border: none;
+  padding: 1rem 3rem; 
+  font-size: 1rem; 
+  border-radius: 10px; 
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  height: 60px; 
+  width: 250px; 
+  position: relative;
+  overflow: hidden;
+  text-align: center; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none; 
+}
+
+
+.submit-button {
+  background-color: rgb(32, 24, 49); 
+  color: #fff;
+  border: none;
+  padding: 1rem 3rem; 
+  font-size: 1rem; 
+  border-radius: 10px; 
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  height: 45px; 
+  width: 250px; 
+  position: relative;
+  overflow: hidden;
+  text-align: center; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none; 
+}
+
+.submit-button:hover {
+  background-color: #1e182f; 
+  transform: scale(1.05); 
+}
+
+.submit-button:disabled {
+  background-color: #3a3f58; 
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.input-form input {
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: none;
+  width: 400px; 
+  font-size: 1rem;
+  background-color: #29233d;
+  color: #fff; 
+  text-align: center;
+}
+
+
+.input-form input::placeholder {
+  color: #e6d9f3; 
+}
+
+.risk-indicator {
+  margin-top: 1rem; 
+  text-align: center;
+}
+
+.input-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; 
+  margin-top: 1rem; 
+}
+
+.risk-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 0.5rem; 
+}
+
+.console {
+  background-color: #1b162d;
+  padding: 1rem;
+  border-radius: 10px;
+  width: 80%;
+  margin: 1.2rem auto; 
+  text-align: left;
+  font-size: 0.875rem;
+  color: #00FF00; 
+  max-height: 200px;
+  overflow-y: auto;
+}
+.console::-webkit-scrollbar {
+  width: 8px;
+}
+
+.console::-webkit-scrollbar-thumb {
+  background-color: rgb(32, 24, 49); 
+  border-radius: 10px;
+}
+
+.console::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(23, 17, 39); 
+}
+
+.console h3 {
+  margin-top: 0;
+}
+
+.console-message {
+  font-family: 'Roboto Mono', monospace; 
+}
+
+
+.main-button a, .submit-button a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+a {
+  text-decoration: none;
+}
+
+.speedometer {
+  margin-bottom: -7rem; 
+}
+
+
+
+
+.another-coin-button {
+  background-color: rgb(32, 24, 49); 
+  color: #fff;
+  border: none;
+  padding: 1rem 3rem; 
+  font-size: 1rem; 
+  border-radius: 10px; 
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  height: 50px; 
+  width: 350px; 
+  position: relative;
+  overflow: hidden;
+  text-align: center; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none; 
+  margin-top: 1rem;
+}
+
+.token-info-table {
+  background-color: #1b162d;
+  color: #fff;
+  margin: 20px auto;
+  width: 80%; /* Match the console width */
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.token-info-table th, .token-info-table td {
+  padding: 12px 15px;
+  border: 1px solid rgb(32, 24, 49);
+  text-align: left;
+}
+
+.token-info-table th {
+  background-color: rgb(32, 24, 49);
+  color: #e6d9f3;
+  font-weight: bold;
+}
+
+.token-info-table td {
+  background-color: #29233d;
+}
+
+.token-info-table img {
+  max-width: 100px;
+}
+
+.token-info-table tr:nth-child(even) td {
+  background-color: rgb(32, 24, 49);
+}
+
+.token-info-table tr:hover td {
+  background-color: #1e182f;
+}
+
+@media (max-width: 768px) {
+  .token-info-table {
+    width: 90%;
+  }
+}
+
+.wallet-button-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.wallet-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.wallet-button:hover {
+  background-color: #0056b3;
+}
+
+.hidden {
+  display: none;
+}
